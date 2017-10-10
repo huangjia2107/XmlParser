@@ -117,10 +117,13 @@ namespace XmlParser.Controls
 
         private void _textBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter && _textBox != null && Text != _textBox.Text)
+            if (e.Key == Key.Enter)
             {
-                _IsManual = true;
-                Text = _textBox.Text;
+                if (_textBox != null && Text != _textBox.Text)
+                {
+                    _IsManual = true;
+                    Text = _textBox.Text;
+                }
 
                 if (_popup != null)
                     _popup.IsOpen = false;
