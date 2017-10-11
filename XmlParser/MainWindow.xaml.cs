@@ -104,15 +104,15 @@ namespace XmlParser
 
             var xmlParseNode = new XmlParseNode { Name = name };
 
-            //检测bool值
-            if (bool.TryParse(value.ToLower(), out isTrue))
-                xmlParseNode.Value = isTrue;
-            else
+            //检测null值
+            if (string.IsNullOrEmpty(value))
+                xmlParseNode.Value = "";
+            else 
             {
-                //检测null值
-                if (string.IsNullOrEmpty(value))
-                    xmlParseNode.Value = "";
-                else
+                //检测bool值
+                if (bool.TryParse(value.ToLower(), out isTrue))
+                    xmlParseNode.Value = isTrue;
+                else 
                 {
                     //检测枚举值
                     object enumValue = null;
