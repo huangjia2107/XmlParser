@@ -22,20 +22,7 @@ namespace XmlParser
                 _XmlNode = value;
                 IsRoot = IsRootNode(value);
             }
-        }
-
-
-        private bool IsRootNode(XmlNode node)
-        {
-            if (node == null)
-                return false;
-
-            return node.NodeType == XmlNodeType.Element
-                && node.ParentNode is XmlDocument
-                && node.ParentNode != null
-                && node.ParentNode.NodeType == XmlNodeType.Document
-                && node.ParentNode.ParentNode == null;
-        }
+        } 
 
         private object _Value;
         public object Value
@@ -101,7 +88,19 @@ namespace XmlParser
 
         public ObservableCollection<XmlParseNode> NodeCollection { get; set; }
 
-        public bool SyncToXmlNode()
+        private bool IsRootNode(XmlNode node)
+        {
+            if (node == null)
+                return false;
+
+            return node.NodeType == XmlNodeType.Element
+                && node.ParentNode is XmlDocument
+                && node.ParentNode != null
+                && node.ParentNode.NodeType == XmlNodeType.Document
+                && node.ParentNode.ParentNode == null;
+        }
+        
+        private bool SyncToXmlNode()
         {
             if (XmlNode == null)
                 return false;
