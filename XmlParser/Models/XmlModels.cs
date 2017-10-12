@@ -49,11 +49,11 @@ namespace XmlParser
             set { _IsVisible = value; InvokePropertyChanged("IsVisible"); }
         }
 
-        private bool _FilterVisible = true;
-        public bool FilterVisible
+        private bool _IsFilterVisible = true;
+        public bool IsFilterVisible
         {
-            get { return _FilterVisible; }
-            set { _FilterVisible = value; InvokePropertyChanged("FilterVisible"); }
+            get { return _IsFilterVisible; }
+            set { _IsFilterVisible = value; InvokePropertyChanged("IsFilterVisible"); }
         }
 
         private bool _IsExpanded;

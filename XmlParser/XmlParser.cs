@@ -82,7 +82,8 @@ namespace XmlParser
                 }
                 else
                 {
-                    xmlParseNode = new XmlParseNode { Name = node.Name, XmlNode = node };
+                    xmlParseNode = ParseNode(node.Name, node.Value, parseNode);
+                    xmlParseNode.XmlNode = node;
 
                     if (node.HasChildNodes && node.ChildNodes.Count > 0)
                     {

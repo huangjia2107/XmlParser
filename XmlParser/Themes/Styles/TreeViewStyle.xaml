@@ -45,7 +45,7 @@
             <Setter.Value>
                 <MultiBinding Converter="{StaticResource boolAndBoolToVisibilityMultiConverter}">
                     <Binding Path="IsVisible"/>
-                    <Binding Path="FilterVisible"/>
+                    <Binding Path="IsFilterVisible"/>
                 </MultiBinding>
             </Setter.Value>
         </Setter>
@@ -169,7 +169,7 @@
             <Setter.Value>
                 <MultiBinding Converter="{StaticResource boolAndBoolToVisibilityMultiConverter}">
                     <Binding Path="IsVisible"/>
-                    <Binding Path="FilterVisible"/>
+                    <Binding Path="IsFilterVisible"/>
                 </MultiBinding>
             </Setter.Value>
         </Setter>

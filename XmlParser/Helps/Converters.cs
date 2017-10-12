@@ -72,7 +72,7 @@ namespace XmlParser
                 return null;
 
             ObservableCollection<XmlParseNode> xpdCollection = (ObservableCollection<XmlParseNode>)value;
-            var attributeList = xpdCollection.Where(xpd => xpd.IsAttribute);
+            var attributeList = xpdCollection.Where(xpd => xpd.IsAttribute && xpd.IsVisible && xpd.IsFilterVisible);
             if (attributeList == null || xpdCollection.Count == 0)
                 return null;
 
@@ -135,7 +135,7 @@ namespace XmlParser
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             if (values.Contains(null) || values.Contains(DependencyProperty.UnsetValue))
-                return false;
+                return Visibility.Visible;
 
             bool _boolValue1 = (bool)values[0];
             bool _boolValue2 = (bool)values[1];
@@ -145,7 +145,7 @@ namespace XmlParser
             if (_boolValue1 == boolValue1 && _boolValue2 == boolValue2)
                 return v;
             else
-                return v == Visibility.Visible ? Visibility.Collapsed : Visibility.Hidden;
+                return v == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)

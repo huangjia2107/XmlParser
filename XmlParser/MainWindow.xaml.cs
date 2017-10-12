@@ -172,13 +172,13 @@ namespace XmlParser
                 nodeList.ForEach(node =>
                 {
                     if (filter == null)
-                        node.FilterVisible = true;
+                        node.IsFilterVisible = true;
                     else
                     {
                         if (node.NodeCollection != null && node.NodeCollection.Count > 0)
-                            node.FilterVisible = node.NodeCollection.FirstOrDefault(n => n.FilterVisible) != null;
+                            node.IsFilterVisible = node.NodeCollection.FirstOrDefault(n => n.IsFilterVisible) != null;
                         else
-                            node.FilterVisible = filter(node.Name);
+                            node.IsFilterVisible = filter(node.Name);
                     }
                 });
             }
