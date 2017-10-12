@@ -6,46 +6,7 @@ using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace XmlParser
-{
-    public class XmlParseAttribute : ViewModelBase
-    {
-        public string Name { get; set; }
-
-        private bool _IsVisible = true;
-        public bool IsVisible
-        {
-            get { return _IsVisible; }
-            set { _IsVisible = value; InvokePropertyChanged("IsVisible"); }
-        }
-
-        private object _Value;
-        public object Value
-        {
-            get { return _Value; }
-            set
-            {
-                _Value = value;
-                ValueType = _Value.GetType();
-
-                InvokePropertyChanged("Value");
-            }
-        }
-
-        private Type _ValueType;
-        public Type ValueType
-        {
-            get { return _ValueType; }
-            set
-            {
-                if (_ValueType != value)
-                {
-                    _ValueType = value;
-                    InvokePropertyChanged("ValueType");
-                }
-            }
-        }
-    }
-
+{ 
     public class XmlParseNode : ViewModelBase
     {
         public string Name { get; set; }
