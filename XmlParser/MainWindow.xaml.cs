@@ -75,7 +75,7 @@ namespace XmlParser
         {
             InitializeComponent();
 
-            _xmlParse = new XmlParserHelper();
+            _xmlParse = new XmlParserHelper(true);
         }
 
         private void button2_Click(object sender, RoutedEventArgs e)
@@ -93,11 +93,7 @@ namespace XmlParser
             {
                 var parser = _xmlParse.TryParse(ofd.FileName, true, ParseNode);
 
-                treeView.DataContext = parser;
-
-                nodeStack.Clear();
-                nodeStack.TrimExcess();
-                ConstructTreeStack(parser.NodeCollection, new List<XmlParseNode>());
+                treeView.DataContext = parser;  
             }
         }
 
@@ -148,71 +144,15 @@ namespace XmlParser
                 xmlParseNode.IsVisible = false;
 
             return xmlParseNode;
-        }
-
-        private void ConstructTreeStack(ObservableCollection<XmlParseNode> nodeCollection, List<XmlParseNode> nodeList)
-        {
-            if (nodeCollection != null && nodeCollection.Count > 0 && nodeList != null)
-            {
-                nodeStack.Push(nodeList);
-
-                var childList = new List<XmlParseNode>();
-                foreach (XmlParseNode node in nodeCollection)
-                {
-                    nodeList.Add(node);
-                    ConstructTreeStack(node.NodeCollection, childList);
-                }
-            }
         } 
-
-        /// <summary>  
-        /// </summary>
-        /// <param name="filter"></param>
-        private void FilterNode(Predicate<string> filter)
-        {
-            foreach (List<XmlParseNode> nodeList in nodeStack)
-            {
-                nodeList.ForEach(node =>
-                {
-                    if (filter == null)
-                        node.IsFilterVisible = true;
-                    else
-                    {
-                        node.IsFilterVisible = filter(node.Name);
-
-                        //父节点满足条件，则所有子节点都显示
-                        //父节点不满足条件，则根据是否存在显示的子节点来决定
-                        if (node.NodeCollection != null && node.NodeCollection.Count > 0)
-                        {
-                            if (node.IsFilterVisible)
-                                UpdateChileNodeVisible(node.NodeCollection, true);
-                            else
-                                node.IsFilterVisible = node.NodeCollection.FirstOrDefault(n => n.IsFilterVisible) != null;
-                        } 
-                    }
-                });
-            }
-        }
-
-        private void UpdateChileNodeVisible(ObservableCollection<XmlParseNode> nodeCollection, bool isVisible)
-        {
-            if (nodeCollection == null || nodeCollection.Count == 0)
-                return;
-
-            foreach (var n in nodeCollection)
-            {
-                n.IsFilterVisible = isVisible;
-                UpdateChileNodeVisible(n.NodeCollection, isVisible);
-            }
-        }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(SearchTextBlock.Text))
-                FilterNode(null);
+                _xmlParse.FilterXmlParseNode(null);
             else
             {
-                FilterNode(nodeName =>
+                _xmlParse.FilterXmlParseNode(nodeName =>
                 {
                     if (MatchCaseCheckBox.IsChecked == true && MatchWholeWodCheckBox.IsChecked == true)
                         return nodeName == SearchTextBlock.Text;
