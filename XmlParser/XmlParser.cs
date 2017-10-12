@@ -39,7 +39,7 @@ namespace XmlParser
                 {
                     var nodeList = new ObservableCollection<XmlParseNode>();
 
-                    ParseXmlNodes(xmlDocument.ChildNodes, isSort, parseNode, nodeList);
+                    ParseXmlNodes(xmlDocument.ChildNodes, nodeList, isSort, parseNode);
 
                     if (nodeList.Count > 0)
                         return new XmlParse { NodeCollection = nodeList };
@@ -61,7 +61,7 @@ namespace XmlParser
         /// <param name="parseNode">自定义构造Attrribute或Node，一般用于决策数据类型或隐藏，参数为null，则所有Value按照字符串处理且均显示</param>
         /// <param name="nodeCollection">存储解析后的子节点集合</param>
         /// <param name="isExistNodeWithMultiAttribute">是否存在带有多个（>=1）属性的节点</param>
-        private void ParseXmlNodes(XmlNodeList xmlNodeList, bool isSort, Func<string, string, XmlParseNode> parseNode, ObservableCollection<XmlParseNode> nodeCollection)
+        private void ParseXmlNodes(XmlNodeList xmlNodeList, ObservableCollection<XmlParseNode> nodeCollection, bool isSort, Func<string, string, XmlParseNode> parseNode)
         {
             if (xmlNodeList == null || nodeCollection == null)
                 return;
@@ -87,7 +87,7 @@ namespace XmlParser
                     if (node.HasChildNodes && node.ChildNodes.Count > 0)
                     {
                         xmlParseNode.NodeCollection = new ObservableCollection<XmlParseNode>();
-                        ParseXmlNodes(node.ChildNodes, isSort, parseNode, xmlParseNode.NodeCollection);
+                        ParseXmlNodes(node.ChildNodes, xmlParseNode.NodeCollection, isSort, parseNode);
                     }
                 }
 
@@ -157,9 +157,9 @@ namespace XmlParser
             }
 
             return false;
-        } 
+        }
 
-        #endregion 
+        #endregion
 
         #region IDisposable Members
 

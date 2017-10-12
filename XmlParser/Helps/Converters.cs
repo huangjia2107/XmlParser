@@ -119,6 +119,39 @@ namespace XmlParser
         {
             return false;
         }
-    } 
+    }
+
+    public class BoolAndBoolToVisibilityMultiConverter : IMultiValueConverter
+    {
+        public BoolAndBoolToVisibilityMultiConverter()
+        {
+            boolValue1 = true;
+            boolValue2 = true;
+        }
+
+        public bool boolValue1 { get; set; }
+        public bool boolValue2 { get; set; }
+
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (values.Contains(null) || values.Contains(DependencyProperty.UnsetValue))
+                return false;
+
+            bool _boolValue1 = (bool)values[0];
+            bool _boolValue2 = (bool)values[1];
+
+            Visibility v = (Visibility)(parameter ?? Visibility.Visible);
+
+            if (_boolValue1 == boolValue1 && _boolValue2 == boolValue2)
+                return v;
+            else
+                return v == Visibility.Visible ? Visibility.Collapsed : Visibility.Hidden;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 
 }

@@ -4,19 +4,42 @@
         Title="Xml Parser" Height="553" Width="949" WindowStartupLocation="CenterScreen"
         Background="White">
     <Grid>
-        <Button Content="Open" Height="44" HorizontalAlignment="Left" Margin="643,3,0,0" Name="button1" VerticalAlignment="Top" Width="131" Click="button1_Click" />
-        <Button Content="Save" Height="44" HorizontalAlignment="Left" Margin="795,3,0,0" Name="button2" VerticalAlignment="Top" Width="131" Click="button2_Click" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <CheckBox x:Name="MatchCaseCheckBox" Content="Match case" VerticalAlignment="Center"/>
+                <CheckBox x:Name="MatchWholeWodCheckBox" Content="Match whole word" VerticalAlignment="Center" Margin="5,0"/>
+                <TextBox x:Name="SearchTextBlock" Grid.Column="0" VerticalContentAlignment="Center" Width="150" Height="30"/>
+            </StackPanel>
 
-        <Border Margin="0,50,0,0" BorderThickness="1" BorderBrush="Black">
-            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Background="Transparent">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" MinWidth="100"/>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="*" MinWidth="100"/>
-                    </Grid.ColumnDefinitions>
+            <Button Grid.Column="1" Content="Filter" Height="40" Width="130" Margin="5,0,0,0" Click="Button_Click" />
+            <Button Grid.Column="5" Content="Open" Height="40" Width="130" Click="button1_Click" />
+            <Button Grid.Column="7" Content="Save" Height="40" Width="130" Click="button2_Click" />
+        </Grid>
 
-                    <TreeView x:Name="treeView" Background="White" FontSize="13"
+        <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Background="Transparent">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MinWidth="100"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*" MinWidth="100"/>
+                </Grid.ColumnDefinitions>
+
+                <TreeView x:Name="treeView" Background="White" FontSize="13"
                           Style="{StaticResource TreeViewStyle}"
                           ItemsSource="{Binding NodeCollection}"
                           ItemContainerStyle="{StaticResource XmlParseNodeTreeViewItemStyle}"
@@ -24,16 +47,16 @@
                           ScrollViewer.VerticalScrollBarVisibility="Disabled"
                           ScrollViewer.HorizontalScrollBarVisibility="Auto">
 
-                        <TreeView.ItemTemplate>
-                            <HierarchicalDataTemplate ItemsSource="{Binding NodeCollection}">
-                                <TextBlock VerticalAlignment="Center" Text="{Binding Name}"/>
-                            </HierarchicalDataTemplate>
-                        </TreeView.ItemTemplate>
-                    </TreeView>
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding NodeCollection}">
+                            <TextBlock VerticalAlignment="Center" Text="{Binding Name}"/>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
 
-                    <GridSplitter Grid.Column="1" Width="3" Background="DarkGray" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
+                <GridSplitter Grid.Column="1" Width="3" Background="DarkGray" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
 
-                    <TreeView Grid.Column="2" Background="#F3F9FF" FontSize="13" 
+                <TreeView Grid.Column="2" Background="#F3F9FF" FontSize="13" 
                           Style="{StaticResource TreeViewStyle}"
                           ItemsSource="{Binding ItemsSource,ElementName=treeView}"
                           ItemContainerStyle="{StaticResource XmlParseNodeValueTreeViewItemStyle}"
@@ -41,11 +64,9 @@
                           ScrollViewer.VerticalScrollBarVisibility="Disabled"
                           ScrollViewer.HorizontalScrollBarVisibility="Auto">
 
-                    </TreeView>
+                </TreeView>
 
-                </Grid>
-            </ScrollViewer>
-
-        </Border>
+            </Grid>
+        </ScrollViewer>
     </Grid>
 </Window>

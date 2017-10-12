@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Collections.ObjectModel;
 
 namespace XmlParser
 {
@@ -68,6 +69,7 @@ namespace XmlParser
     public partial class MainWindow : Window
     {
         XmlParserHelper _xmlParse = null;
+        Stack<List<XmlParseNode>> nodeStack = new Stack<List<XmlParseNode>>();
 
         public MainWindow()
         {
@@ -89,7 +91,13 @@ namespace XmlParser
 
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                treeView.DataContext = _xmlParse.TryParse(ofd.FileName, true, ParseNode);
+                var parser = _xmlParse.TryParse(ofd.FileName, true, ParseNode);
+
+                treeView.DataContext = parser;
+
+                nodeStack.Clear();
+                nodeStack.TrimExcess();
+                ConstructTreeStack(parser.NodeCollection, new List<XmlParseNode>());
             }
         }
 
@@ -107,12 +115,12 @@ namespace XmlParser
             //检测null值
             if (string.IsNullOrEmpty(value))
                 xmlParseNode.Value = "";
-            else 
+            else
             {
                 //检测bool值
                 if (bool.TryParse(value.ToLower(), out isTrue))
                     xmlParseNode.Value = isTrue;
-                else 
+                else
                 {
                     //检测枚举值
                     object enumValue = null;
@@ -142,6 +150,61 @@ namespace XmlParser
             return xmlParseNode;
         }
 
+        private void ConstructTreeStack(ObservableCollection<XmlParseNode> nodeCollection, List<XmlParseNode> nodeList)
+        {
+            if (nodeCollection != null && nodeCollection.Count > 0 && nodeList != null)
+            {
+                nodeStack.Push(nodeList);
+
+                var childList = new List<XmlParseNode>();
+                foreach (XmlParseNode node in nodeCollection)
+                {
+                    nodeList.Add(node);
+                    ConstructTreeStack(node.NodeCollection, childList);
+                }
+            }
+        }
+
+        private void FilterNode(Predicate<string> filter)
+        {
+            foreach (List<XmlParseNode> nodeList in nodeStack)
+            {
+                nodeList.ForEach(node =>
+                {
+                    if (filter == null)
+                        node.FilterVisible = true;
+                    else
+                    {
+                        if (node.NodeCollection != null && node.NodeCollection.Count > 0)
+                            node.FilterVisible = node.NodeCollection.FirstOrDefault(n => n.FilterVisible) != null;
+                        else
+                            node.FilterVisible = filter(node.Name);
+                    }
+                });
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(SearchTextBlock.Text))
+                FilterNode(null);
+            else
+            {
+                FilterNode(nodeName =>
+                {
+                    if (MatchCaseCheckBox.IsChecked == true && MatchWholeWodCheckBox.IsChecked == true)
+                        return nodeName == SearchTextBlock.Text;
+
+                    if (MatchCaseCheckBox.IsChecked == true)
+                        return nodeName.Contains(SearchTextBlock.Text);
+
+                    if (MatchWholeWodCheckBox.IsChecked == true)
+                        return nodeName.ToLower() == SearchTextBlock.Text.ToLower();
+
+                    return nodeName.ToLower().Contains(SearchTextBlock.Text.ToLower());
+                });
+            }
+        }
     }
 }
 

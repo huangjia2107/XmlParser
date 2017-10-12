@@ -6,14 +6,16 @@ using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace XmlParser
-{ 
+{
     public class XmlParseNode : ViewModelBase
     {
+        #region public
+
         public string Name { get; set; }
         public bool IsAttribute { get; set; }
+        public ObservableCollection<XmlParseNode> NodeCollection { get; set; }
 
         private XmlNode _XmlNode;
-
         public XmlNode XmlNode
         {
             get { return _XmlNode; }
@@ -22,7 +24,7 @@ namespace XmlParser
                 _XmlNode = value;
                 IsRoot = IsRootNode(value);
             }
-        } 
+        }
 
         private object _Value;
         public object Value
@@ -39,6 +41,31 @@ namespace XmlParser
                 InvokePropertyChanged("Value");
             }
         }
+
+        private bool _IsVisible = true;
+        public bool IsVisible
+        {
+            get { return _IsVisible; }
+            set { _IsVisible = value; InvokePropertyChanged("IsVisible"); }
+        }
+
+        private bool _FilterVisible = true;
+        public bool FilterVisible
+        {
+            get { return _FilterVisible; }
+            set { _FilterVisible = value; InvokePropertyChanged("FilterVisible"); }
+        }
+
+        private bool _IsExpanded;
+        public bool IsExpanded
+        {
+            get { return _IsExpanded; }
+            set { _IsExpanded = value; InvokePropertyChanged("IsExpanded"); }
+        }
+
+        #endregion
+
+        #region protected
 
         private bool _HasValue;
         public bool HasValue
@@ -65,20 +92,6 @@ namespace XmlParser
             }
         }
 
-        private bool _IsVisible = true;
-        public bool IsVisible
-        {
-            get { return _IsVisible; }
-            set { _IsVisible = value; InvokePropertyChanged("IsVisible"); }
-        }
-
-        private bool _IsExpanded;
-        public bool IsExpanded
-        {
-            get { return _IsExpanded; }
-            set { _IsExpanded = value; InvokePropertyChanged("IsExpanded"); }
-        }
-
         private bool _IsRoot;
         public bool IsRoot
         {
@@ -86,7 +99,9 @@ namespace XmlParser
             protected set { _IsRoot = value; InvokePropertyChanged("IsRoot"); }
         }
 
-        public ObservableCollection<XmlParseNode> NodeCollection { get; set; }
+        #endregion
+
+        #region func
 
         private bool IsRootNode(XmlNode node)
         {
@@ -99,7 +114,7 @@ namespace XmlParser
                 && node.ParentNode.NodeType == XmlNodeType.Document
                 && node.ParentNode.ParentNode == null;
         }
-        
+
         private bool SyncToXmlNode()
         {
             if (XmlNode == null)
@@ -129,6 +144,8 @@ namespace XmlParser
 
             return false;
         }
+
+        #endregion
     }
 
     public class XmlParse

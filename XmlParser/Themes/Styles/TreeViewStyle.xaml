@@ -9,6 +9,7 @@
     <local:ObjectToStringConverter x:Key="objectToStringConverter"/>
     <local:OnlyOneTreeViewItemConverter x:Key="onlyOneTreeViewItemToBoolConverter"/>
     <local:LastTreeViewItemConverter x:Key="lastTreeViewItemToBoolConverter"/>
+    <local:BoolAndBoolToVisibilityMultiConverter x:Key="boolAndBoolToVisibilityMultiConverter"/>
 
     <Style x:Key="ExpandCollapseToggleStyle" TargetType="{x:Type ToggleButton}">
         <Setter Property="Focusable" Value="False"/>
@@ -40,7 +41,14 @@
         <Setter Property="Margin" Value="0"/>
         <Setter Property="Foreground" Value="#004080"/>
         <Setter Property="IsExpanded" Value="{Binding IsExpanded,Mode=TwoWay}"/>
-        <Setter Property="Visibility" Value="{Binding IsVisible,Converter={StaticResource boolToVisibilityConverter}}"/>
+        <Setter Property="Visibility">
+            <Setter.Value>
+                <MultiBinding Converter="{StaticResource boolAndBoolToVisibilityMultiConverter}">
+                    <Binding Path="IsVisible"/>
+                    <Binding Path="FilterVisible"/>
+                </MultiBinding>
+            </Setter.Value>
+        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TreeViewItem}">
@@ -157,7 +165,14 @@
         <Setter Property="Margin" Value="0"/>
         <Setter Property="Foreground" Value="#800000"/>
         <Setter Property="IsExpanded" Value="{Binding IsExpanded,Mode=OneWay}"/>
-        <Setter Property="Visibility" Value="{Binding IsVisible,Converter={StaticResource boolToVisibilityConverter}}"/>
+        <Setter Property="Visibility">
+            <Setter.Value>
+                <MultiBinding Converter="{StaticResource boolAndBoolToVisibilityMultiConverter}">
+                    <Binding Path="IsVisible"/>
+                    <Binding Path="FilterVisible"/>
+                </MultiBinding>
+            </Setter.Value>
+        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TreeViewItem}">
