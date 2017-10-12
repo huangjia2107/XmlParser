@@ -85,8 +85,8 @@
                         </Border>
                         <ItemsPresenter x:Name="ItemsHost" Grid.ColumnSpan="2" Grid.Column="1" Grid.Row="1"/>
                     </Grid>
-                    <ControlTemplate.Triggers>
-
+                    <ControlTemplate.Triggers> 
+                        
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Converter={StaticResource onlyOneTreeViewItemToBoolConverter}}" Value="true"/>
@@ -94,23 +94,12 @@
                             </MultiDataTrigger.Conditions>
                             <Setter TargetName="TopVerLine" Property="Visibility" Value="Collapsed"/>
                             <Setter TargetName="MiddleVerLine" Property="Visibility" Value="Collapsed"/>
-                        </MultiDataTrigger>
-
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Converter={StaticResource onlyOneTreeViewItemToBoolConverter}}" Value="true"/>
-                                <Condition Binding="{Binding IsRoot}" Value="false"/>
-                            </MultiDataTrigger.Conditions>
-                            <Setter TargetName="TopVerLine" Property="Grid.RowSpan" Value="1"/>
-                            <Setter TargetName="MiddleVerLine" Property="Visibility" Value="Collapsed"/>
-                        </MultiDataTrigger>
-
+                        </MultiDataTrigger> 
 
                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Converter={StaticResource lastTreeViewItemToBoolConverter}}" Value="true">
                             <Setter TargetName="TopVerLine" Property="Grid.RowSpan" Value="1"/>
                             <Setter TargetName="MiddleVerLine" Property="Visibility" Value="Collapsed"/>
-                        </DataTrigger>
-
+                        </DataTrigger> 
 
                         <DataTrigger Binding="{Binding IsAttribute}" Value="true">
                             <Setter Property="Foreground" Value="#800000"/>
@@ -128,6 +117,7 @@
                             <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
                             <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
                         </Trigger>
+                        
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsSelected" Value="true"/>
@@ -136,6 +126,7 @@
                             <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
                             <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
                         </MultiTrigger>
+                        
                         <Trigger Property="IsEnabled" Value="false">
                             <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
                         </Trigger>

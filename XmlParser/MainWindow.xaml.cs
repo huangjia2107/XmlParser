@@ -68,19 +68,19 @@ namespace XmlParser
     /// </summary>
     public partial class MainWindow : Window
     {
-        XmlParserHelper _xmlParse = null;
+        XmlParserHelper _xmlParserHelper = null; 
         Stack<List<XmlParseNode>> nodeStack = new Stack<List<XmlParseNode>>();
 
         public MainWindow()
         {
             InitializeComponent();
 
-            _xmlParse = new XmlParserHelper(true);
+            _xmlParserHelper = new XmlParserHelper(true);
         }
 
         private void button2_Click(object sender, RoutedEventArgs e)
         {
-            _xmlParse.SaveXml("d:\\ss.xml");
+            _xmlParserHelper.SaveXml("d:\\ss.xml");
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
@@ -91,9 +91,7 @@ namespace XmlParser
 
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                var parser = _xmlParse.TryParse(ofd.FileName, true, ParseNode);
-
-                treeView.DataContext = parser;  
+                 treeView.DataContext = _xmlParserHelper.TryParse(ofd.FileName, true, ParseNode); 
             }
         }
 
@@ -149,10 +147,10 @@ namespace XmlParser
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(SearchTextBlock.Text))
-                _xmlParse.FilterXmlParseNode(null);
+                _xmlParserHelper.FilterXmlParseNode(null);
             else
             {
-                _xmlParse.FilterXmlParseNode(nodeName =>
+                _xmlParserHelper.FilterXmlParseNode(nodeName =>
                 {
                     if (MatchCaseCheckBox.IsChecked == true && MatchWholeWodCheckBox.IsChecked == true)
                         return nodeName == SearchTextBlock.Text;
