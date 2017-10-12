@@ -12,8 +12,18 @@ namespace XmlParser
         #region public
 
         public string Name { get; set; }
-        public bool IsAttribute { get; set; }
         public ObservableCollection<XmlParseNode> NodeCollection { get; set; }
+
+        private bool _IsAttribute;
+        public bool IsAttribute
+        {
+            get { return _IsAttribute; }
+            set
+            {
+                _IsAttribute = value;
+                HasValue = IsHasValue();
+            }
+        }
 
         private XmlNode _XmlNode;
         public XmlNode XmlNode
@@ -22,7 +32,8 @@ namespace XmlParser
             set
             {
                 _XmlNode = value;
-                IsRoot = IsRootNode(value);
+                IsRoot = IsRootNode();
+                HasValue = IsHasValue();
             }
         }
 
@@ -34,10 +45,8 @@ namespace XmlParser
             {
                 _Value = value;
                 ValueType = _Value.GetType();
-                HasValue = _Value != null;
 
-                SyncToXmlNode();
-
+                SyncToXmlNode(); 
                 InvokePropertyChanged("Value");
             }
         }
@@ -103,16 +112,30 @@ namespace XmlParser
 
         #region func
 
-        private bool IsRootNode(XmlNode node)
+        private bool IsHasValue()
         {
-            if (node == null)
+            if (XmlNode == null)
                 return false;
 
-            return node.NodeType == XmlNodeType.Element
-                && node.ParentNode is XmlDocument
-                && node.ParentNode != null
-                && node.ParentNode.NodeType == XmlNodeType.Document
-                && node.ParentNode.ParentNode == null;
+            if (IsAttribute)
+                return true;
+            else
+            {
+                /* <Node>Text</Node> */
+                return XmlNode.HasChildNodes && XmlNode.ChildNodes.Count == 1 && XmlNode.FirstChild.NodeType == XmlNodeType.Text;
+            }
+        }
+
+        private bool IsRootNode()
+        {
+            if (XmlNode == null)
+                return false;
+
+            return XmlNode.NodeType == XmlNodeType.Element
+                && XmlNode.ParentNode is XmlDocument
+                && XmlNode.ParentNode != null
+                && XmlNode.ParentNode.NodeType == XmlNodeType.Document
+                && XmlNode.ParentNode.ParentNode == null;
         }
 
         private bool SyncToXmlNode()

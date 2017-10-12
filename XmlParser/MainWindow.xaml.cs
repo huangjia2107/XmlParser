@@ -163,8 +163,11 @@ namespace XmlParser
                     ConstructTreeStack(node.NodeCollection, childList);
                 }
             }
-        }
+        } 
 
+        /// <summary>  
+        /// </summary>
+        /// <param name="filter"></param>
         private void FilterNode(Predicate<string> filter)
         {
             foreach (List<XmlParseNode> nodeList in nodeStack)
@@ -175,12 +178,31 @@ namespace XmlParser
                         node.IsFilterVisible = true;
                     else
                     {
+                        node.IsFilterVisible = filter(node.Name);
+
+                        //父节点满足条件，则所有子节点都显示
+                        //父节点不满足条件，则根据是否存在显示的子节点来决定
                         if (node.NodeCollection != null && node.NodeCollection.Count > 0)
-                            node.IsFilterVisible = node.NodeCollection.FirstOrDefault(n => n.IsFilterVisible) != null;
-                        else
-                            node.IsFilterVisible = filter(node.Name);
+                        {
+                            if (node.IsFilterVisible)
+                                UpdateChileNodeVisible(node.NodeCollection, true);
+                            else
+                                node.IsFilterVisible = node.NodeCollection.FirstOrDefault(n => n.IsFilterVisible) != null;
+                        } 
                     }
                 });
+            }
+        }
+
+        private void UpdateChileNodeVisible(ObservableCollection<XmlParseNode> nodeCollection, bool isVisible)
+        {
+            if (nodeCollection == null || nodeCollection.Count == 0)
+                return;
+
+            foreach (var n in nodeCollection)
+            {
+                n.IsFilterVisible = isVisible;
+                UpdateChileNodeVisible(n.NodeCollection, isVisible);
             }
         }
 

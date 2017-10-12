@@ -75,7 +75,7 @@ namespace XmlParser
                 XmlParseNode xmlParseNode = null;
 
                 if (node.HasChildNodes && node.ChildNodes.Count == 1 && node.FirstChild.NodeType == XmlNodeType.Text)
-                {
+                { 
                     /* <Node>Text</Node> */
                     xmlParseNode = ParseNode(node.Name, node.FirstChild.Value, parseNode);
                     xmlParseNode.XmlNode = node;
