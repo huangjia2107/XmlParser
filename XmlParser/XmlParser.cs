@@ -222,7 +222,7 @@ namespace XmlParser
                         if (node.NodeCollection != null && node.NodeCollection.Count > 0)
                         {
                             if (node.IsFilterVisible)
-                                UpdateChileNodeVisible(node.NodeCollection, true);
+                                UpdateChildNodeVisible(node.NodeCollection, true);
                             else
                                 node.IsFilterVisible = node.NodeCollection.FirstOrDefault(n => n.IsFilterVisible) != null;
                         }
@@ -231,7 +231,7 @@ namespace XmlParser
             }
         }
 
-        private void UpdateChileNodeVisible(ObservableCollection<XmlParseNode> nodeCollection, bool isVisible)
+        private void UpdateChildNodeVisible(ObservableCollection<XmlParseNode> nodeCollection, bool isVisible)
         {
             if (nodeCollection == null || nodeCollection.Count == 0)
                 return;
@@ -239,7 +239,7 @@ namespace XmlParser
             foreach (var n in nodeCollection)
             {
                 n.IsFilterVisible = isVisible;
-                UpdateChileNodeVisible(n.NodeCollection, isVisible);
+                UpdateChildNodeVisible(n.NodeCollection, isVisible);
             }
         }
 
