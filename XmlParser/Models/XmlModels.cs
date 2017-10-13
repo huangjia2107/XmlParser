@@ -11,7 +11,12 @@ namespace XmlParser
     {
         #region public
 
-        public string Name { get; set; }
+        public string OriginalName { get; set; }
+
+        public object Tag { get; set; }
+
+        public string DisplayName { get; set; }
+
         public ObservableCollection<XmlParseNode> NodeCollection { get; set; }
 
         private bool _IsAttribute;
@@ -46,7 +51,7 @@ namespace XmlParser
                 _Value = value;
                 ValueType = _Value.GetType();
 
-                SyncToXmlNode(); 
+                SyncToXmlNode();
                 InvokePropertyChanged("Value");
             }
         }
@@ -145,8 +150,8 @@ namespace XmlParser
 
             if (IsAttribute)
             {
-                var attribute = XmlNode.Attributes[Name];
-                if (attribute != null && attribute.Name == Name)
+                var attribute = XmlNode.Attributes[OriginalName];
+                if (attribute != null && attribute.Name == OriginalName)
                 {
                     attribute.Value = (Value ?? string.Empty).ToString();
                     return true;
@@ -157,7 +162,7 @@ namespace XmlParser
                 /* <Node>Text</Node> */
                 if (XmlNode.HasChildNodes && XmlNode.ChildNodes.Count == 1 && XmlNode.FirstChild.NodeType == XmlNodeType.Text)
                 {
-                    if (Name == XmlNode.Name)
+                    if (OriginalName == XmlNode.Name)
                     {
                         XmlNode.FirstChild.Value = (Value ?? string.Empty).ToString();
                         return true;

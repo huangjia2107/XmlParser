@@ -145,9 +145,9 @@ namespace XmlParser
                     if (isSort)
                     {
                         if (orderedEnumerable != null)
-                            orderedEnumerable = orderedEnumerable.ThenBy(n => n.Name);
+                            orderedEnumerable = orderedEnumerable.ThenBy(n => n.DisplayName);
                         else
-                            orderedEnumerable = xmlParseNode.NodeCollection.OrderBy(n => n.Name);
+                            orderedEnumerable = xmlParseNode.NodeCollection.OrderBy(n => n.DisplayName);
                     }
 
                     if (orderedEnumerable != null)
@@ -163,7 +163,7 @@ namespace XmlParser
             if (string.IsNullOrEmpty(name))
                 return null;
 
-            return parseNode != null ? parseNode(name, value) : new XmlParseNode { Name = name, Value = value };
+            return parseNode != null ? parseNode(name, value) : new XmlParseNode { OriginalName = name, DisplayName = name, Value = value };
         }
 
         #endregion
@@ -216,7 +216,7 @@ namespace XmlParser
                         node.IsFilterVisible = true;
                     else
                     {
-                        node.IsFilterVisible = filter(node.Name);
+                        node.IsFilterVisible = filter(node.DisplayName);
 
                         //父节点满足条件，则所有子节点都显示
                         //父节点不满足条件，则根据是否存在显示的子节点来决定

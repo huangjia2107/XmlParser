@@ -68,7 +68,7 @@ namespace XmlParser
     /// </summary>
     public partial class MainWindow : Window
     {
-        XmlParserHelper _xmlParserHelper = null; 
+        XmlParserHelper _xmlParserHelper = null;
         Stack<List<XmlParseNode>> nodeStack = new Stack<List<XmlParseNode>>();
 
         public MainWindow()
@@ -91,7 +91,7 @@ namespace XmlParser
 
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                 treeView.DataContext = _xmlParserHelper.TryParse(ofd.FileName, true, ParseNode); 
+                treeView.DataContext = _xmlParserHelper.TryParse(ofd.FileName, true, ParseNode);
             }
         }
 
@@ -104,7 +104,7 @@ namespace XmlParser
 
             bool isTrue = false;
 
-            var xmlParseNode = new XmlParseNode { Name = name };
+            var xmlParseNode = new XmlParseNode { DisplayName = name, OriginalName = name,Tag="mm" };
 
             //检测null值
             if (string.IsNullOrEmpty(value))
@@ -138,11 +138,11 @@ namespace XmlParser
                 }
             }
 
-            if (xmlParseNode.Name == "JobShowMode" || xmlParseNode.Name == "AutoDetectZPrintPosition")
+            if (xmlParseNode.OriginalName == "JobShowMode" || xmlParseNode.OriginalName == "AutoDetectZPrintPosition")
                 xmlParseNode.IsVisible = false;
 
             return xmlParseNode;
-        } 
+        }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {

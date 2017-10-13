@@ -279,11 +279,19 @@
 
 
     <HierarchicalDataTemplate x:Key="XmlParseStringDataTemplate" ItemsSource="{Binding NodeCollection}">
-        <controls:PopupTextBox VerticalContentAlignment="Center"
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <controls:PopupTextBox VerticalContentAlignment="Center"
                                Text="{Binding Value,Converter={StaticResource objectToStringConverter}}"
                                Foreground="{Binding Foreground,RelativeSource={RelativeSource AncestorType=TreeViewItem}}"
                                IsHitTestVisible="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=TreeViewItem}}"
                                />
+            <TextBlock Grid.Column="1" Text="{Binding Tag,Converter={StaticResource objectToStringConverter}}" VerticalAlignment="Center" Margin="3,0,5,0"/>
+        </Grid>
+        
     </HierarchicalDataTemplate>
 
     <HierarchicalDataTemplate x:Key="XmlParseEnumDataTemplate" ItemsSource="{Binding NodeCollection}">

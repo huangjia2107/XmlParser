@@ -49,7 +49,7 @@
 
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding NodeCollection}">
-                            <TextBlock VerticalAlignment="Center" Text="{Binding Name}"/>
+                            <TextBlock VerticalAlignment="Center" Text="{Binding DisplayName}"/>
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
                 </TreeView>

@@ -76,7 +76,7 @@ namespace XmlParser
             if (attributeList == null || xpdCollection.Count == 0)
                 return null;
 
-            string tooltip = string.Join("\n", attributeList.Select(xpd => string.Format("{0} = \"{1}\"", xpd.Name, xpd.Value)).ToArray<string>());
+            string tooltip = string.Join("\n", attributeList.Select(xpd => string.Format("{0} = \"{1}\"", xpd.DisplayName, xpd.Value)).ToArray<string>());
 
             if (string.IsNullOrEmpty(tooltip))
                 return null;
@@ -103,7 +103,7 @@ namespace XmlParser
         {
             return false;
         }
-    } 
+    }
 
     public class LastTreeViewItemMultiConverter : IMultiValueConverter
     {
@@ -118,6 +118,9 @@ namespace XmlParser
                 return false;
 
             var ic = ItemsControl.ItemsControlFromItemContainer(item);
+            if (ic == null)
+                return false;
+
             var curIndex = ic.ItemContainerGenerator.IndexFromContainer(item);
 
             int i = curIndex + 1;
