@@ -11,6 +11,7 @@ namespace XmlParser
     public class XmlParserHelper : IDisposable
     {
         private XmlDocument _xmlDocument;
+        private XmlParse _xmlParse;
         private Stack<List<XmlParseNode>> FilterStack;
 
         public bool IsSupportFilter { get; private set; }
@@ -33,17 +34,17 @@ namespace XmlParser
         /// <returns>XmlParse</returns>
         public XmlParse TryParse(string xmlPath, bool isSort, Func<string, string, XmlParseNode> parseNode)
         {
-            var xmlParse = ParseXml(xmlPath, isSort, parseNode, ref _xmlDocument);
+            _xmlParse = ParseXml(xmlPath, isSort, parseNode, ref _xmlDocument);
 
             if (IsSupportFilter)
             {
                 FilterStack.Clear();
                 FilterStack.TrimExcess();
 
-                ConstructFilterStack(xmlParse.NodeCollection, new List<XmlParseNode>());
+                ConstructFilterStack(_xmlParse.NodeCollection, new List<XmlParseNode>());
             }
 
-            return xmlParse;
+            return _xmlParse;
         }
 
         #region Parse
@@ -204,7 +205,7 @@ namespace XmlParser
 
         public void FilterXmlParseNode(Predicate<string> filter)
         {
-            if (!IsSupportFilter || FilterStack == null)
+            if (!IsSupportFilter || FilterStack == null || FilterStack.Count == 0)
                 return;
 
             foreach (List<XmlParseNode> nodeList in FilterStack)
@@ -229,6 +230,14 @@ namespace XmlParser
                     }
                 });
             }
+
+            RefreshFilterFlag();
+        }
+
+        private void RefreshFilterFlag()
+        {
+            if (_xmlParse != null)
+                _xmlParse.FilterChanged = !_xmlParse.FilterChanged;
         }
 
         private void UpdateChildNodeVisible(ObservableCollection<XmlParseNode> nodeCollection, bool isVisible)
@@ -243,13 +252,14 @@ namespace XmlParser
             }
         }
 
-        #endregion 
+        #endregion
 
         #region IDisposable Members
 
         public void Dispose()
         {
             _xmlDocument = null;
+            _xmlParse = null;
 
             if (FilterStack != null)
             {

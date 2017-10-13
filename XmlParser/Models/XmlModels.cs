@@ -171,8 +171,19 @@ namespace XmlParser
         #endregion
     }
 
-    public class XmlParse
+    public class XmlParse : ViewModelBase
     {
+        private bool _FilterChanged;
+        public bool FilterChanged
+        {
+            get { return _FilterChanged; }
+            set
+            {
+                _FilterChanged = value;
+                InvokePropertyChanged("FilterChanged");
+            }
+        }
+
         public ObservableCollection<XmlParseNode> NodeCollection { get; set; }
     }
 }

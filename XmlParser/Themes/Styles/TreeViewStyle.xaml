@@ -7,8 +7,8 @@
     <local:EnumTypeToItemSourceConverter x:Key="enumTypeToItemsSourceConverter"/>
     <local:XmlParseNodeCollectionToToolTipConverter x:Key="xmlParseNodeCollectionToToolTipConverter"/>
     <local:ObjectToStringConverter x:Key="objectToStringConverter"/>
-    <local:OnlyOneTreeViewItemConverter x:Key="onlyOneTreeViewItemToBoolConverter"/>
-    <local:LastTreeViewItemConverter x:Key="lastTreeViewItemToBoolConverter"/>
+    <local:OnlyOneTreeViewItemConverter x:Key="onlyOneTreeViewItemToBoolConverter"/> 
+    <local:LastTreeViewItemMultiConverter x:Key="lastTreeViewItemMultiConverter"/>
     <local:BoolAndBoolToVisibilityMultiConverter x:Key="boolAndBoolToVisibilityMultiConverter"/>
 
     <Style x:Key="ExpandCollapseToggleStyle" TargetType="{x:Type ToggleButton}">
@@ -85,8 +85,8 @@
                         </Border>
                         <ItemsPresenter x:Name="ItemsHost" Grid.ColumnSpan="2" Grid.Column="1" Grid.Row="1"/>
                     </Grid>
-                    <ControlTemplate.Triggers> 
-                        
+                    <ControlTemplate.Triggers>
+
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Converter={StaticResource onlyOneTreeViewItemToBoolConverter}}" Value="true"/>
@@ -94,12 +94,18 @@
                             </MultiDataTrigger.Conditions>
                             <Setter TargetName="TopVerLine" Property="Visibility" Value="Collapsed"/>
                             <Setter TargetName="MiddleVerLine" Property="Visibility" Value="Collapsed"/>
-                        </MultiDataTrigger> 
+                        </MultiDataTrigger>
 
-                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Converter={StaticResource lastTreeViewItemToBoolConverter}}" Value="true">
+                        <DataTrigger Value="true">
+                            <DataTrigger.Binding>
+                                <MultiBinding Converter="{StaticResource lastTreeViewItemMultiConverter}">
+                                    <Binding RelativeSource="{RelativeSource Self}"/>
+                                    <Binding Path="DataContext.FilterChanged" RelativeSource="{RelativeSource AncestorType=TreeView}"/>
+                                </MultiBinding>
+                            </DataTrigger.Binding>
                             <Setter TargetName="TopVerLine" Property="Grid.RowSpan" Value="1"/>
                             <Setter TargetName="MiddleVerLine" Property="Visibility" Value="Collapsed"/>
-                        </DataTrigger> 
+                        </DataTrigger>
 
                         <DataTrigger Binding="{Binding IsAttribute}" Value="true">
                             <Setter Property="Foreground" Value="#800000"/>
@@ -117,7 +123,7 @@
                             <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
                             <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
                         </Trigger>
-                        
+
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsSelected" Value="true"/>
@@ -126,7 +132,7 @@
                             <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
                             <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
                         </MultiTrigger>
-                        
+
                         <Trigger Property="IsEnabled" Value="false">
                             <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
                         </Trigger>
@@ -292,5 +298,5 @@
                   IsChecked="{Binding Value,Mode=TwoWay}"
                   />
     </HierarchicalDataTemplate>
-    
+
 </ResourceDictionary>

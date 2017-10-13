@@ -103,21 +103,37 @@ namespace XmlParser
         {
             return false;
         }
-    }
+    } 
 
-    public class LastTreeViewItemConverter : IValueConverter
+    public class LastTreeViewItemMultiConverter : IMultiValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            var item = (TreeViewItem)value;
-            var ic = ItemsControl.ItemsControlFromItemContainer(item);
+            if (values.Contains(null) || values.Contains(DependencyProperty.UnsetValue))
+                return false;
 
-            return ic.ItemContainerGenerator.IndexFromContainer(item) == ic.Items.Count - 1;
+            var item = (TreeViewItem)values[0];
+
+            if (item.Visibility != Visibility.Visible)
+                return false;
+
+            var ic = ItemsControl.ItemsControlFromItemContainer(item);
+            var curIndex = ic.ItemContainerGenerator.IndexFromContainer(item);
+
+            int i = curIndex + 1;
+            for (; i < ic.Items.Count; i++)
+            {
+                var curItem = (TreeViewItem)ic.ItemContainerGenerator.ContainerFromItem(ic.Items[0]);
+                if (curItem.Visibility == Visibility.Visible)
+                    return false;
+            }
+
+            return true;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
         {
-            return false;
+            throw new NotImplementedException();
         }
     }
 
