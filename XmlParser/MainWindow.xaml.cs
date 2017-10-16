@@ -91,7 +91,7 @@ namespace XmlParser
 
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                treeView.DataContext = _xmlParserHelper.TryParse(ofd.FileName, true, ParseNode);
+                treeView.DataContext = _xmlParserHelper.TryParse(ofd.FileName, false, ParseNode);
             }
         }
 
@@ -104,7 +104,7 @@ namespace XmlParser
 
             bool isTrue = false;
 
-            var xmlParseNode = new XmlParseNode { DisplayName = name, OriginalName = name,Tag="mm" };
+            var xmlParseNode = new XmlParseNode { DisplayName = name, OriginalName = name, Tag = "mm" };
 
             //检测null值
             if (string.IsNullOrEmpty(value))
@@ -140,6 +140,15 @@ namespace XmlParser
 
             if (xmlParseNode.OriginalName == "JobShowMode" || xmlParseNode.OriginalName == "AutoDetectZPrintPosition")
                 xmlParseNode.IsVisible = false;
+
+            if (xmlParseNode.OriginalName == "AfterPrintAdditionalHeat")
+                xmlParseNode.DisplayName = "打印后额外加热";
+
+            if (xmlParseNode.OriginalName == "PrinterID")
+                xmlParseNode.DisplayName = "打印机ID";
+
+            if (xmlParseNode.OriginalName == "VenderID")
+                xmlParseNode.DisplayName = "供应商ID";
 
             return xmlParseNode;
         }

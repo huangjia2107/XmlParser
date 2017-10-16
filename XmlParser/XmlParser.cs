@@ -128,7 +128,7 @@ namespace XmlParser
                         if (xpd != null)
                         {
                             xpd.IsAttribute = true;
-                            xpd.XmlNode = node;
+                            xpd.XmlNode = attribute;
                             xmlParseNode.NodeCollection.Add(xpd);
                         }
                     }

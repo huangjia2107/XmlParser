@@ -51,7 +51,7 @@ namespace XmlParser
                 _Value = value;
                 ValueType = _Value.GetType();
 
-                SyncToXmlNode();
+                SyncValueToXmlNode();
                 InvokePropertyChanged("Value");
             }
         }
@@ -143,14 +143,14 @@ namespace XmlParser
                 && XmlNode.ParentNode.ParentNode == null;
         }
 
-        private bool SyncToXmlNode()
+        private bool SyncValueToXmlNode()
         {
             if (XmlNode == null)
                 return false;
 
-            if (IsAttribute)
+            if (IsAttribute && XmlNode is XmlAttribute)
             {
-                var attribute = XmlNode.Attributes[OriginalName];
+                var attribute = XmlNode as XmlAttribute;
                 if (attribute != null && attribute.Name == OriginalName)
                 {
                     attribute.Value = (Value ?? string.Empty).ToString();
@@ -160,9 +160,9 @@ namespace XmlParser
             else
             {
                 /* <Node>Text</Node> */
-                if (XmlNode.HasChildNodes && XmlNode.ChildNodes.Count == 1 && XmlNode.FirstChild.NodeType == XmlNodeType.Text)
+                if (XmlNode != null && XmlNode.HasChildNodes && XmlNode.ChildNodes.Count == 1 && XmlNode.FirstChild.NodeType == XmlNodeType.Text)
                 {
-                    if (OriginalName == XmlNode.Name)
+                    if (XmlNode.Name == OriginalName)
                     {
                         XmlNode.FirstChild.Value = (Value ?? string.Empty).ToString();
                         return true;
