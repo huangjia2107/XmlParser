@@ -6,9 +6,9 @@ using System.Xml;
 using System.Collections.ObjectModel;
 using System.IO;
 
-namespace XmlParser
+namespace XmlHelps
 {
-    public class XmlParserHelper : IDisposable
+    public class XmlParser : IDisposable
     {
         private XmlDocument _xmlDocument;
         private XmlParse _xmlParse;
@@ -16,9 +16,9 @@ namespace XmlParser
 
         public bool IsSupportFilter { get; private set; }
 
-        public XmlParserHelper() { }
+        public XmlParser() { }
 
-        public XmlParserHelper(bool isSupportFilter)
+        public XmlParser(bool isSupportFilter)
         {
             IsSupportFilter = isSupportFilter;
 
@@ -32,7 +32,7 @@ namespace XmlParser
         /// <param name="isSort">节点排序</param>
         /// <param name="parseNode">自定义节点解析，可为null</param>
         /// <returns>XmlParse</returns>
-        public XmlParse TryParse(string xmlPath, bool isSort, Func<string, string, XmlParseNode> parseNode)
+        public XmlParse TryParse(string xmlPath, bool isSort, Action<XmlParseNode> parseNode)
         {
             _xmlParse = ParseXml(xmlPath, isSort, parseNode, ref _xmlDocument);
 
@@ -49,7 +49,7 @@ namespace XmlParser
 
         #region Parse
 
-        private XmlParse ParseXml(string xmlPath, bool isSort, Func<string, string, XmlParseNode> parseNode, ref XmlDocument xmlDocument)
+        private XmlParse ParseXml(string xmlPath, bool isSort, Action<XmlParseNode> parseNode, ref XmlDocument xmlDocument)
         {
             if (!File.Exists(xmlPath))
                 return null;
@@ -81,11 +81,10 @@ namespace XmlParser
         /// 
         /// </summary>
         /// <param name="xmlNodeList">Xml中子节点集合</param>
+        /// /// <param name="nodeCollection">存储解析后的子节点集合</param>
         /// <param name="isSort">是否针对属性和节点进行排序</param>
         /// <param name="parseNode">自定义构造Attrribute或Node，一般用于决策数据类型或隐藏，参数为null，则所有Value按照字符串处理且均显示</param>
-        /// <param name="nodeCollection">存储解析后的子节点集合</param>
-        /// <param name="isExistNodeWithMultiAttribute">是否存在带有多个（>=1）属性的节点</param>
-        private void ParseXmlNodes(XmlNodeList xmlNodeList, ObservableCollection<XmlParseNode> nodeCollection, bool isSort, Func<string, string, XmlParseNode> parseNode)
+        private void ParseXmlNodes(XmlNodeList xmlNodeList, ObservableCollection<XmlParseNode> nodeCollection, bool isSort, Action<XmlParseNode> parseNode)
         {
             if (xmlNodeList == null || nodeCollection == null)
                 return;
@@ -96,17 +95,17 @@ namespace XmlParser
                 if (node.NodeType != XmlNodeType.Element)
                     continue;
 
-                XmlParseNode xmlParseNode = null;
+                var xmlParseNode = new XmlParseNode();
 
                 if (node.HasChildNodes && node.ChildNodes.Count == 1 && node.FirstChild.NodeType == XmlNodeType.Text)
                 {
                     /* <Node>Text</Node> */
-                    xmlParseNode = ParseNode(node.Name, node.FirstChild.Value, parseNode);
+                    ParseNode(node.Name, node.FirstChild.Value, parseNode, ref xmlParseNode);
                     xmlParseNode.XmlNode = node;
                 }
                 else
                 {
-                    xmlParseNode = ParseNode(node.Name, node.Value, parseNode);
+                    ParseNode(node.Name, node.Value, parseNode, ref xmlParseNode);
                     xmlParseNode.XmlNode = node;
 
                     if (node.HasChildNodes && node.ChildNodes.Count > 0)
@@ -124,13 +123,13 @@ namespace XmlParser
 
                     foreach (XmlAttribute attribute in node.Attributes)
                     {
-                        var xpd = ParseNode(attribute.Name, attribute.Value, parseNode);
-                        if (xpd != null)
+                        var xmlParseAttributeNode = new XmlParseNode
                         {
-                            xpd.IsAttribute = true;
-                            xpd.XmlNode = attribute;
-                            xmlParseNode.NodeCollection.Add(xpd);
-                        }
+                            IsAttribute = true,
+                            XmlNode = attribute
+                        };
+                        ParseNode(attribute.Name, attribute.Value, parseNode, ref xmlParseAttributeNode);
+                        xmlParseNode.NodeCollection.Add(xmlParseAttributeNode);
                     }
                 }
 
@@ -158,12 +157,17 @@ namespace XmlParser
             }
         }
 
-        private XmlParseNode ParseNode(string name, string value, Func<string, string, XmlParseNode> parseNode)
+        private void ParseNode(string name, string value, Action<XmlParseNode> parseNode, ref XmlParseNode xmlParseNode)
         {
-            if (string.IsNullOrEmpty(name))
-                return null;
+            if (xmlParseNode == null)
+                xmlParseNode = new XmlParseNode();
 
-            return parseNode != null ? parseNode(name, value) : new XmlParseNode { OriginalName = name, DisplayName = name, Value = value };
+            xmlParseNode.OriginalName = name;
+            xmlParseNode.DisplayName = name;
+            xmlParseNode.Value = string.IsNullOrEmpty(value) ? string.Empty : value;
+
+            if (parseNode != null)
+                parseNode(xmlParseNode);
         }
 
         #endregion

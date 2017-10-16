@@ -5,42 +5,14 @@ using System.Text;
 using System.Collections.ObjectModel;
 using System.Xml;
 
-namespace XmlParser
+namespace XmlHelps
 {
     public class XmlParseNode : ViewModelBase
     {
         #region public
 
-        public string OriginalName { get; set; }
-
-        public object Tag { get; set; }
-
         public string DisplayName { get; set; }
-
-        public ObservableCollection<XmlParseNode> NodeCollection { get; set; }
-
-        private bool _IsAttribute;
-        public bool IsAttribute
-        {
-            get { return _IsAttribute; }
-            set
-            {
-                _IsAttribute = value;
-                HasValue = IsHasValue();
-            }
-        }
-
-        private XmlNode _XmlNode;
-        public XmlNode XmlNode
-        {
-            get { return _XmlNode; }
-            set
-            {
-                _XmlNode = value;
-                IsRoot = IsRootNode();
-                HasValue = IsHasValue();
-            }
-        }
+        public object Tag { get; set; }
 
         private object _Value;
         public object Value
@@ -63,18 +35,53 @@ namespace XmlParser
             set { _IsVisible = value; InvokePropertyChanged("IsVisible"); }
         }
 
-        private bool _IsFilterVisible = true;
-        public bool IsFilterVisible
-        {
-            get { return _IsFilterVisible; }
-            set { _IsFilterVisible = value; InvokePropertyChanged("IsFilterVisible"); }
-        }
-
         private bool _IsExpanded;
         public bool IsExpanded
         {
             get { return _IsExpanded; }
             set { _IsExpanded = value; InvokePropertyChanged("IsExpanded"); }
+        }
+
+        #endregion
+
+        #region internal
+
+        public string OriginalName { get; internal set; }
+        public ObservableCollection<XmlParseNode> NodeCollection { get; internal set; }
+
+        private bool _IsAttribute;
+        public bool IsAttribute
+        {
+            get { return _IsAttribute; }
+            internal set
+            {
+                _IsAttribute = value;
+                HasValue = IsHasValue();
+            }
+
+        }
+
+        private XmlNode _XmlNode;
+        public XmlNode XmlNode
+        {
+            get { return _XmlNode; }
+            internal set
+            {
+                _XmlNode = value;
+                IsRoot = IsRootNode();
+                HasValue = IsHasValue();
+            }
+        }
+
+        private bool _IsFilterVisible = true;
+        public bool IsFilterVisible
+        {
+            get { return _IsFilterVisible; }
+            internal set 
+            { 
+                _IsFilterVisible = value; 
+                InvokePropertyChanged("IsFilterVisible"); 
+            }
         }
 
         #endregion
@@ -110,7 +117,11 @@ namespace XmlParser
         public bool IsRoot
         {
             get { return _IsRoot; }
-            protected set { _IsRoot = value; InvokePropertyChanged("IsRoot"); }
+            protected set 
+            { 
+                _IsRoot = value;
+                InvokePropertyChanged("IsRoot"); 
+            }
         }
 
         #endregion

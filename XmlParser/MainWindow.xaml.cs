@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
+using XmlHelps;
 
 namespace XmlParser
 {
@@ -68,14 +69,14 @@ namespace XmlParser
     /// </summary>
     public partial class MainWindow : Window
     {
-        XmlParserHelper _xmlParserHelper = null;
+        XmlHelps.XmlParser _xmlParserHelper = null;
         Stack<List<XmlParseNode>> nodeStack = new Stack<List<XmlParseNode>>();
 
         public MainWindow()
         {
             InitializeComponent();
 
-            _xmlParserHelper = new XmlParserHelper(true);
+            _xmlParserHelper = new XmlHelps.XmlParser(true);
         }
 
         private void button2_Click(object sender, RoutedEventArgs e)
@@ -97,14 +98,16 @@ namespace XmlParser
 
         public List<Type> arrayList = new List<Type> { typeof(PrinterType), typeof(NPType), typeof(VisibilityType), typeof(SuppportType), typeof(Align), typeof(Unit), typeof(MBVersion) };
 
-        private XmlParseNode ParseNode(string name, string value)
+        private void ParseNode(XmlParseNode xmlParseNode)
         {
-            if (string.IsNullOrEmpty(name))
-                return null;
+            if (xmlParseNode == null)
+                return; 
+
+            //Tag
+            xmlParseNode.Tag = "mm";
 
             bool isTrue = false;
-
-            var xmlParseNode = new XmlParseNode { DisplayName = name, OriginalName = name, Tag = "mm" };
+            string value = xmlParseNode.Value.ToString();
 
             //检测null值
             if (string.IsNullOrEmpty(value))
@@ -138,9 +141,11 @@ namespace XmlParser
                 }
             }
 
+            //Visibility
             if (xmlParseNode.OriginalName == "JobShowMode" || xmlParseNode.OriginalName == "AutoDetectZPrintPosition")
                 xmlParseNode.IsVisible = false;
 
+            //DisplayName
             if (xmlParseNode.OriginalName == "AfterPrintAdditionalHeat")
                 xmlParseNode.DisplayName = "打印后额外加热";
 
@@ -149,8 +154,6 @@ namespace XmlParser
 
             if (xmlParseNode.OriginalName == "VenderID")
                 xmlParseNode.DisplayName = "供应商ID";
-
-            return xmlParseNode;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
