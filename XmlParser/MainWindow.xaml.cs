@@ -102,10 +102,7 @@ namespace XmlParser
         {
             if (xmlParseNode == null)
                 return; 
-
-            //Tag
-            xmlParseNode.Tag = "mm";
-
+             
             bool isTrue = false;
             string value = xmlParseNode.Value.ToString();
 
@@ -150,10 +147,16 @@ namespace XmlParser
                 xmlParseNode.DisplayName = "打印后额外加热";
 
             if (xmlParseNode.OriginalName == "PrinterID")
+            {
                 xmlParseNode.DisplayName = "打印机ID";
+                xmlParseNode.Tag = "mm";
+            }
 
             if (xmlParseNode.OriginalName == "VenderID")
+            {
                 xmlParseNode.DisplayName = "供应商ID";
+                xmlParseNode.Tag = "mm";
+            }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

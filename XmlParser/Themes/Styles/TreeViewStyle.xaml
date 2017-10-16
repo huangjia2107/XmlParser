@@ -10,6 +10,7 @@
     <local:OnlyOneTreeViewItemConverter x:Key="onlyOneTreeViewItemToBoolConverter"/> 
     <local:LastTreeViewItemMultiConverter x:Key="lastTreeViewItemMultiConverter"/>
     <local:BoolAndBoolToVisibilityMultiConverter x:Key="boolAndBoolToVisibilityMultiConverter"/>
+    <local:NullOrEmptyToVisibilityConverter x:Key="nullOrEmptyToVisibilityConverter"/>
 
     <Style x:Key="ExpandCollapseToggleStyle" TargetType="{x:Type ToggleButton}">
         <Setter Property="Focusable" Value="False"/>
@@ -289,7 +290,9 @@
                                Foreground="{Binding Foreground,RelativeSource={RelativeSource AncestorType=TreeViewItem}}"
                                IsHitTestVisible="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=TreeViewItem}}"
                                />
-            <TextBlock Grid.Column="1" Text="{Binding Tag,Converter={StaticResource objectToStringConverter}}" VerticalAlignment="Center" Margin="3,0,5,0"/>
+            <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="3,0,5,0"
+                       Text="{Binding Tag,Converter={StaticResource objectToStringConverter}}" 
+                       Visibility="{Binding Text,RelativeSource={RelativeSource Self},Converter={StaticResource nullOrEmptyToVisibilityConverter}}"/>
         </Grid>
         
     </HierarchicalDataTemplate>
