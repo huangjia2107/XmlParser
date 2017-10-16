@@ -77,10 +77,10 @@ namespace XmlHelps
         public bool IsFilterVisible
         {
             get { return _IsFilterVisible; }
-            internal set 
-            { 
-                _IsFilterVisible = value; 
-                InvokePropertyChanged("IsFilterVisible"); 
+            internal set
+            {
+                _IsFilterVisible = value;
+                InvokePropertyChanged("IsFilterVisible");
             }
         }
 
@@ -117,10 +117,10 @@ namespace XmlHelps
         public bool IsRoot
         {
             get { return _IsRoot; }
-            protected set 
-            { 
+            protected set
+            {
                 _IsRoot = value;
-                InvokePropertyChanged("IsRoot"); 
+                InvokePropertyChanged("IsRoot");
             }
         }
 
@@ -193,13 +193,13 @@ namespace XmlHelps
         public bool FilterChanged
         {
             get { return _FilterChanged; }
-            set
+            internal set
             {
                 _FilterChanged = value;
                 InvokePropertyChanged("FilterChanged");
             }
         }
 
-        public ObservableCollection<XmlParseNode> NodeCollection { get; set; }
+        public ObservableCollection<XmlParseNode> NodeCollection { get; internal set; }
     }
 }
