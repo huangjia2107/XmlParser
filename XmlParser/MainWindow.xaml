@@ -31,7 +31,7 @@
             <Button Grid.Column="7" Content="Save" Height="40" Width="130" Click="button2_Click" />
         </Grid>
 
-        <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Background="Transparent">
+        <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Background="Transparent" PreviewDrop="ScrollViewer_PreviewDrop" AllowDrop="True">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MinWidth="100"/>

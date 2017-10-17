@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using XmlHelps;
+using System.IO;
 
 namespace XmlParser
 {
@@ -72,11 +73,14 @@ namespace XmlParser
         XmlHelps.XmlParser _xmlParserHelper = null;
         Stack<List<XmlParseNode>> nodeStack = new Stack<List<XmlParseNode>>();
 
-        public MainWindow()
+        public MainWindow(string xmlPath)
         {
             InitializeComponent();
 
             _xmlParserHelper = new XmlHelps.XmlParser(true);
+
+            if (!string.IsNullOrEmpty(xmlPath) && File.Exists(xmlPath) && System.IO.Path.GetExtension(xmlPath).ToLower() == ".xml")
+                treeView.DataContext = _xmlParserHelper.TryParse(xmlPath, false, ParseNode);
         }
 
         private void button2_Click(object sender, RoutedEventArgs e)
@@ -101,8 +105,8 @@ namespace XmlParser
         private void ParseNode(XmlParseNode xmlParseNode)
         {
             if (xmlParseNode == null)
-                return; 
-             
+                return;
+
             bool isTrue = false;
             string value = xmlParseNode.Value.ToString();
 
@@ -154,7 +158,7 @@ namespace XmlParser
 
             if (xmlParseNode.OriginalName == "VenderID")
             {
-                xmlParseNode.DisplayName = "供应商ID";
+                xmlParseNode.DisplayName = "厂商ID";
                 xmlParseNode.Tag = "mm";
             }
         }
@@ -178,6 +182,25 @@ namespace XmlParser
 
                     return nodeName.ToLower().Contains(SearchTextBlock.Text.ToLower());
                 });
+            }
+        }
+
+        private void ScrollViewer_Drop(object sender, DragEventArgs e)
+        {
+
+        }
+
+        private void ScrollViewer_PreviewDrop(object sender, DragEventArgs e)
+        {
+            if (((int)(e.Effects) & (int)(DragDropEffects.Copy)) != 0)
+            {
+                string[] fileUrls = e.Data.GetData(DataFormats.FileDrop) as string[];
+                if (fileUrls != null)
+                {
+                    treeView.DataContext = _xmlParserHelper.TryParse(fileUrls[0], false, ParseNode);
+                }
+
+                e.Handled = true;
             }
         }
     }

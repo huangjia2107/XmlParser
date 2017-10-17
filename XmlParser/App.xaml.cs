@@ -12,5 +12,12 @@ namespace XmlParser
     /// </summary>
     public partial class App : Application
     {
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            if (e.Args != null && e.Args.Length > 0)
+                (new MainWindow(e.Args[0])).Show();
+            else
+                (new MainWindow(null)).Show();
+        }
     }
 }
