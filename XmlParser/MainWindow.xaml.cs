@@ -85,7 +85,12 @@ namespace XmlParser
 
         private void button2_Click(object sender, RoutedEventArgs e)
         {
-            _xmlParserHelper.SaveXml("d:\\ss.xml");
+            System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
+            sfd.Filter = "XML|*.xml";
+            if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                _xmlParserHelper.SaveXml(sfd.FileName);
+            }
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
@@ -96,7 +101,7 @@ namespace XmlParser
 
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                treeView.DataContext = _xmlParserHelper.TryParse(ofd.FileName, false, ParseNode);
+                treeView.DataContext = _xmlParserHelper.TryParse(ofd.FileName, SortCheckBox.IsChecked.Value, ParseNode);
             }
         }
 
@@ -185,11 +190,6 @@ namespace XmlParser
             }
         }
 
-        private void ScrollViewer_Drop(object sender, DragEventArgs e)
-        {
-
-        }
-
         private void ScrollViewer_PreviewDrop(object sender, DragEventArgs e)
         {
             if (((int)(e.Effects) & (int)(DragDropEffects.Copy)) != 0)
@@ -202,6 +202,12 @@ namespace XmlParser
 
                 e.Handled = true;
             }
+        } 
+
+        private void SortCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            if (_xmlParserHelper != null)
+                treeView.DataContext = _xmlParserHelper.TryParse(_xmlParserHelper.BaseURI, SortCheckBox.IsChecked.Value, ParseNode);
         }
     }
 }

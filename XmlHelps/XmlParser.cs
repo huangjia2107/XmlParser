@@ -16,6 +16,8 @@ namespace XmlHelps
 
         public bool IsSupportFilter { get; private set; }
 
+        public string BaseURI { get { return _xmlDocument == null ? null : _xmlDocument.BaseURI.Replace("file:///", ""); } }
+
         public XmlParser() { }
 
         public XmlParser(bool isSupportFilter)
@@ -36,7 +38,7 @@ namespace XmlHelps
         {
             _xmlParse = ParseXml(xmlPath, isSort, parseNode, ref _xmlDocument);
 
-            if (IsSupportFilter)
+            if (IsSupportFilter && _xmlParse != null)
             {
                 FilterStack.Clear();
                 FilterStack.TrimExcess();
