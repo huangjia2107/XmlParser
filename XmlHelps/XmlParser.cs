@@ -12,20 +12,20 @@ namespace XmlHelps
     {
         private XmlDocument _xmlDocument;
         private XmlParse _xmlParse;
-        private Stack<List<XmlParseNode>> FilterStack;
+        private Stack<List<XmlParseNode>> _childToParentNodeStack;
 
         public bool IsSupportFilter { get; private set; }
 
         public string BaseURI { get { return _xmlDocument == null ? null : _xmlDocument.BaseURI.Replace("file:///", ""); } }
 
-        public XmlParser() { }
+        public XmlParser()
+            : this(false)
+        { }
 
         public XmlParser(bool isSupportFilter)
         {
             IsSupportFilter = isSupportFilter;
-
-            if (isSupportFilter)
-                FilterStack = new Stack<List<XmlParseNode>>();
+            _childToParentNodeStack = new Stack<List<XmlParseNode>>();
         }
 
         /// <summary>
@@ -38,12 +38,13 @@ namespace XmlHelps
         {
             _xmlParse = ParseXml(xmlPath, isSort, parseNode, ref _xmlDocument);
 
-            if (IsSupportFilter && _xmlParse != null)
+            if (_xmlParse != null)
             {
-                FilterStack.Clear();
-                FilterStack.TrimExcess();
+                _childToParentNodeStack.Clear();
+                _childToParentNodeStack.TrimExcess();
 
-                ConstructFilterStack(_xmlParse.NodeCollection, new List<XmlParseNode>());
+                ConstructC2PStack(_xmlParse.NodeCollection, new List<XmlParseNode>());
+                UpdateXmlParseNodeVisible();
             }
 
             return _xmlParse;
@@ -63,12 +64,11 @@ namespace XmlHelps
 
                 if (xmlDocument.HasChildNodes)
                 {
-                    var nodeList = new ObservableCollection<XmlParseNode>();
+                    var xmlparseNode = new XmlParseNode();
+                    ParseXmlNodes(xmlparseNode, xmlDocument.ChildNodes, isSort, parseNode);
 
-                    ParseXmlNodes(xmlDocument.ChildNodes, nodeList, isSort, parseNode);
-
-                    if (nodeList.Count > 0)
-                        return new XmlParse { NodeCollection = nodeList };
+                    if (xmlparseNode.NodeCollection != null && xmlparseNode.NodeCollection.Count > 0)
+                        return new XmlParse { NodeCollection = xmlparseNode.NodeCollection };
                 }
             }
             catch
@@ -82,14 +82,17 @@ namespace XmlHelps
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="xmlNodeList">Xml中子节点集合</param>
-        /// /// <param name="nodeCollection">存储解析后的子节点集合</param>
+        /// <param name="parentNode">父节点</param>
+        /// <param name="xmlNodeList">Xml子节点集合</param>
         /// <param name="isSort">是否针对属性和节点进行排序</param>
         /// <param name="parseNode">自定义构造Attrribute或Node，一般用于决策数据类型或隐藏，参数为null，则所有Value按照字符串处理且均显示</param>
-        private void ParseXmlNodes(XmlNodeList xmlNodeList, ObservableCollection<XmlParseNode> nodeCollection, bool isSort, Action<XmlParseNode> parseNode)
+        private void ParseXmlNodes(XmlParseNode parentNode, XmlNodeList xmlNodeList, bool isSort, Action<XmlParseNode> parseNode)
         {
-            if (xmlNodeList == null || nodeCollection == null)
+            if (xmlNodeList == null || parentNode == null)
                 return;
+
+            if (parentNode.NodeCollection == null)
+                parentNode.NodeCollection = new ObservableCollection<XmlParseNode>();
 
             foreach (XmlNode node in xmlNodeList)
             {
@@ -97,24 +100,19 @@ namespace XmlHelps
                 if (node.NodeType != XmlNodeType.Element)
                     continue;
 
-                var xmlParseNode = new XmlParseNode();
+                var xmlParseNode = new XmlParseNode { XmlNode = node, Parent = parentNode };
 
                 if (node.HasChildNodes && node.ChildNodes.Count == 1 && node.FirstChild.NodeType == XmlNodeType.Text)
                 {
                     /* <Node>Text</Node> */
                     ParseNode(node.Name, node.FirstChild.Value, parseNode, ref xmlParseNode);
-                    xmlParseNode.XmlNode = node;
                 }
                 else
                 {
                     ParseNode(node.Name, node.Value, parseNode, ref xmlParseNode);
-                    xmlParseNode.XmlNode = node;
 
                     if (node.HasChildNodes && node.ChildNodes.Count > 0)
-                    {
-                        xmlParseNode.NodeCollection = new ObservableCollection<XmlParseNode>();
-                        ParseXmlNodes(node.ChildNodes, xmlParseNode.NodeCollection, isSort, parseNode);
-                    }
+                        ParseXmlNodes(xmlParseNode, node.ChildNodes, isSort, parseNode);
                 }
 
                 //解析 Attribute
@@ -128,8 +126,10 @@ namespace XmlHelps
                         var xmlParseAttributeNode = new XmlParseNode
                         {
                             IsAttribute = true,
-                            XmlNode = attribute
+                            XmlNode = attribute,
+                            Parent = xmlParseNode
                         };
+
                         ParseNode(attribute.Name, attribute.Value, parseNode, ref xmlParseAttributeNode);
                         xmlParseNode.NodeCollection.Add(xmlParseAttributeNode);
                     }
@@ -155,7 +155,7 @@ namespace XmlHelps
                         xmlParseNode.NodeCollection = new ObservableCollection<XmlParseNode>(orderedEnumerable);
                 }
 
-                nodeCollection.Add(xmlParseNode);
+                parentNode.NodeCollection.Add(xmlParseNode);
             }
         }
 
@@ -170,6 +170,68 @@ namespace XmlHelps
 
             if (parseNode != null)
                 parseNode(xmlParseNode);
+        }
+
+        /// <summary>
+        /// 便于自下而上遍历节点
+        /// </summary>
+        /// <param name="nodeCollection"></param>
+        /// <param name="nodeList"></param>
+        private void ConstructC2PStack(ObservableCollection<XmlParseNode> nodeCollection, List<XmlParseNode> nodeList)
+        {
+            if (nodeCollection != null && nodeCollection.Count > 0 && nodeList != null)
+            {
+                _childToParentNodeStack.Push(nodeList);
+
+                var childList = new List<XmlParseNode>();
+                foreach (XmlParseNode node in nodeCollection)
+                {
+                    nodeList.Add(node);
+                    ConstructC2PStack(node.NodeCollection, childList);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 若当前节点可见：
+        /// 1.该节点以上的父节点均得可见
+        /// 2.若该节点所有子节点均不可见，则该节点以下的子节点均得可见
+        /// </summary>
+        private void UpdateXmlParseNodeVisible()
+        {
+            if (_childToParentNodeStack == null || _childToParentNodeStack.Count == 0)
+                return;
+
+            foreach (List<XmlParseNode> nodeList in _childToParentNodeStack)
+            {
+                nodeList.ForEach(node =>
+                {
+                    if (node.IsVisible)
+                    {
+                        node.UpdateParentVisible(true);
+
+                        if (node.NodeCollection != null && node.NodeCollection.Count > 0)
+                        {
+                            if (node.NodeCollection.FirstOrDefault(n => n.IsVisible) == null)
+                                UpdateAllChildNodeAction(node.NodeCollection, n => n.IsVisible = true);
+                        }
+                    }
+                });
+            }  
+        }
+
+        private void UpdateAllChildNodeAction(ObservableCollection<XmlParseNode> nodeCollection, Action<XmlParseNode> action)
+        {
+            if (nodeCollection == null || nodeCollection.Count == 0)
+                return;
+
+            foreach (var n in nodeCollection)
+            {
+                if (action != null)
+                    action(n);
+
+                UpdateAllChildNodeAction(n.NodeCollection, action);
+            }
         }
 
         #endregion
@@ -194,27 +256,12 @@ namespace XmlHelps
 
         #region Filter
 
-        private void ConstructFilterStack(ObservableCollection<XmlParseNode> nodeCollection, List<XmlParseNode> nodeList)
-        {
-            if (nodeCollection != null && nodeCollection.Count > 0 && nodeList != null)
-            {
-                FilterStack.Push(nodeList);
-
-                var childList = new List<XmlParseNode>();
-                foreach (XmlParseNode node in nodeCollection)
-                {
-                    nodeList.Add(node);
-                    ConstructFilterStack(node.NodeCollection, childList);
-                }
-            }
-        }
-
         public void FilterXmlParseNode(Predicate<string> filter)
         {
-            if (!IsSupportFilter || FilterStack == null || FilterStack.Count == 0)
+            if (!IsSupportFilter || _childToParentNodeStack == null || _childToParentNodeStack.Count == 0)
                 return;
 
-            foreach (List<XmlParseNode> nodeList in FilterStack)
+            foreach (List<XmlParseNode> nodeList in _childToParentNodeStack)
             {
                 nodeList.ForEach(node =>
                 {
@@ -229,7 +276,7 @@ namespace XmlHelps
                         if (node.NodeCollection != null && node.NodeCollection.Count > 0)
                         {
                             if (node.IsFilterVisible)
-                                UpdateChildNodeVisible(node.NodeCollection, true);
+                                UpdateAllChildNodeAction(node.NodeCollection, n => n.IsFilterVisible = true);
                             else
                                 node.IsFilterVisible = node.NodeCollection.FirstOrDefault(n => n.IsFilterVisible) != null;
                         }
@@ -246,18 +293,6 @@ namespace XmlHelps
                 _xmlParse.FilterChanged = !_xmlParse.FilterChanged;
         }
 
-        private void UpdateChildNodeVisible(ObservableCollection<XmlParseNode> nodeCollection, bool isVisible)
-        {
-            if (nodeCollection == null || nodeCollection.Count == 0)
-                return;
-
-            foreach (var n in nodeCollection)
-            {
-                n.IsFilterVisible = isVisible;
-                UpdateChildNodeVisible(n.NodeCollection, isVisible);
-            }
-        }
-
         #endregion
 
         #region IDisposable Members
@@ -267,11 +302,11 @@ namespace XmlHelps
             _xmlDocument = null;
             _xmlParse = null;
 
-            if (FilterStack != null)
+            if (_childToParentNodeStack != null)
             {
-                FilterStack.Clear();
-                FilterStack.TrimExcess();
-                FilterStack = null;
+                _childToParentNodeStack.Clear();
+                _childToParentNodeStack.TrimExcess();
+                _childToParentNodeStack = null;
             }
 
             GC.SuppressFinalize(this);

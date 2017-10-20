@@ -47,6 +47,8 @@ namespace XmlHelps
         #region internal
 
         public string OriginalName { get; internal set; }
+        public XmlParseNode Parent { get; internal set; }
+
         public ObservableCollection<XmlParseNode> NodeCollection { get; internal set; }
 
         private bool _IsAttribute;
@@ -127,6 +129,16 @@ namespace XmlHelps
         #endregion
 
         #region func
+
+        internal void UpdateParentVisible(bool isVisible)
+        {
+            if (Parent != null)
+            {
+                Parent.IsVisible = isVisible;
+                Parent.UpdateParentVisible(isVisible);
+            }
+
+        }
 
         private bool IsHasValue()
         {

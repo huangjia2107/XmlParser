@@ -127,7 +127,7 @@ namespace XmlParser
             int i = curIndex + 1;
             for (; i < ic.Items.Count; i++)
             {
-                var curItem = (TreeViewItem)ic.ItemContainerGenerator.ContainerFromItem(ic.Items[0]);
+                var curItem = (TreeViewItem)ic.ItemContainerGenerator.ContainerFromItem(ic.Items[i]);
                 if (curItem.Visibility == Visibility.Visible)
                     return false;
             }

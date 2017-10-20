@@ -101,11 +101,29 @@ namespace XmlParser
 
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                treeView.DataContext = _xmlParserHelper.TryParse(ofd.FileName, SortCheckBox.IsChecked.Value, ParseNode);
+                treeView.DataContext = _xmlParserHelper.TryParse(ofd.FileName, SortCheckBox.IsChecked.Value, ParseNode); 
             }
         }
 
         public List<Type> arrayList = new List<Type> { typeof(PrinterType), typeof(NPType), typeof(VisibilityType), typeof(SuppportType), typeof(Align), typeof(Unit), typeof(MBVersion) };
+
+        public readonly List<string> MainBoardConfigVisibleNodeList = new List<string>
+        {
+            "maximumAccelerateDistance",
+            "motionMaxLength",
+            "MoveSpeed",
+            "RollbackSpeed",
+            "EncoderResolution",
+            "printResolution",
+            "moveResolution",
+            "carWidth",
+            "leftUVOffset",
+            "rightUVOffset",
+            "NPBoardNum",
+            "multipleCleanColorMap",
+            "manufactoryName",
+            "Name"
+        };
 
         private void ParseNode(XmlParseNode xmlParseNode)
         {
@@ -148,8 +166,7 @@ namespace XmlParser
             }
 
             //Visibility
-            if (xmlParseNode.OriginalName == "JobShowMode" || xmlParseNode.OriginalName == "AutoDetectZPrintPosition")
-                xmlParseNode.IsVisible = false;
+            xmlParseNode.IsVisible = MainBoardConfigVisibleNodeList.Contains(xmlParseNode.OriginalName);
 
             //DisplayName
             if (xmlParseNode.OriginalName == "AfterPrintAdditionalHeat")
