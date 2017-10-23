@@ -28,15 +28,15 @@ namespace XmlHelps
             _childToParentNodeStack = new Stack<List<XmlParseNode>>();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="isSort">节点排序</param>
         /// <param name="parseNode">自定义节点解析，可为null</param>
         /// <returns>XmlParse</returns>
-        public XmlParse TryParse(string xmlPath, bool isSort, Action<XmlParseNode> parseNode)
+        public XmlParse TryParse(Action<XmlDocument> loadXml, bool isSort, Action<XmlParseNode> parseNode)
         {
-            _xmlParse = ParseXml(xmlPath, isSort, parseNode, ref _xmlDocument);
+            if (loadXml == null)
+                return null;
+
+            _xmlParse = ParseXml(loadXml, isSort, parseNode, ref _xmlDocument);
 
             if (_xmlParse != null)
             {
@@ -52,15 +52,15 @@ namespace XmlHelps
 
         #region Parse
 
-        private XmlParse ParseXml(string xmlPath, bool isSort, Action<XmlParseNode> parseNode, ref XmlDocument xmlDocument)
+        private XmlParse ParseXml(Action<XmlDocument> loadXml, bool isSort, Action<XmlParseNode> parseNode, ref XmlDocument xmlDocument)
         {
-            if (!File.Exists(xmlPath))
+            if (loadXml == null)
                 return null;
 
             try
             {
                 xmlDocument = new XmlDocument();
-                xmlDocument.Load(xmlPath);
+                loadXml(xmlDocument);
 
                 if (xmlDocument.HasChildNodes)
                 {
@@ -217,7 +217,7 @@ namespace XmlHelps
                         }
                     }
                 });
-            }  
+            }
         }
 
         private void UpdateAllChildNodeAction(ObservableCollection<XmlParseNode> nodeCollection, Action<XmlParseNode> action)
@@ -238,14 +238,14 @@ namespace XmlHelps
 
         #region Save
 
-        public bool SaveXml(string savePath)
+        public bool SaveXml(Action<XmlDocument> saveXml)
         {
-            if (string.IsNullOrEmpty(savePath))
-                throw new ArgumentNullException("savePath");
+            if (saveXml == null)
+                throw new ArgumentNullException("saveXml");
 
             if (_xmlDocument != null)
             {
-                _xmlDocument.Save(savePath);
+                saveXml(_xmlDocument);
                 return true;
             }
 

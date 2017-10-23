@@ -80,7 +80,7 @@ namespace XmlParser
             _xmlParserHelper = new XmlHelps.XmlParser(true);
 
             if (!string.IsNullOrEmpty(xmlPath) && File.Exists(xmlPath) && System.IO.Path.GetExtension(xmlPath).ToLower() == ".xml")
-                treeView.DataContext = _xmlParserHelper.TryParse(xmlPath, false, ParseNode);
+                treeView.DataContext = _xmlParserHelper.TryParse(x => x.Load(xmlPath), false, ParseNode);
         }
 
         private void button2_Click(object sender, RoutedEventArgs e)
@@ -89,7 +89,7 @@ namespace XmlParser
             sfd.Filter = "XML|*.xml";
             if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                _xmlParserHelper.SaveXml(sfd.FileName);
+                _xmlParserHelper.SaveXml(x => x.Save(sfd.FileName));
             }
         }
 
@@ -101,7 +101,7 @@ namespace XmlParser
 
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                treeView.DataContext = _xmlParserHelper.TryParse(ofd.FileName, SortCheckBox.IsChecked.Value, ParseNode); 
+                treeView.DataContext = _xmlParserHelper.TryParse(x => x.Load(ofd.FileName), SortCheckBox.IsChecked.Value, ParseNode);
             }
         }
 
@@ -214,17 +214,17 @@ namespace XmlParser
                 string[] fileUrls = e.Data.GetData(DataFormats.FileDrop) as string[];
                 if (fileUrls != null)
                 {
-                    treeView.DataContext = _xmlParserHelper.TryParse(fileUrls[0], false, ParseNode);
+                    treeView.DataContext = _xmlParserHelper.TryParse(x => x.Load(fileUrls[0]), false, ParseNode);
                 }
 
                 e.Handled = true;
             }
-        } 
+        }
 
         private void SortCheckBox_Click(object sender, RoutedEventArgs e)
         {
             if (_xmlParserHelper != null)
-                treeView.DataContext = _xmlParserHelper.TryParse(_xmlParserHelper.BaseURI, SortCheckBox.IsChecked.Value, ParseNode);
+                treeView.DataContext = _xmlParserHelper.TryParse(x => x.Load(_xmlParserHelper.BaseURI), SortCheckBox.IsChecked.Value, ParseNode);
         }
     }
 }
