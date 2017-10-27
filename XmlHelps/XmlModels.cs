@@ -176,7 +176,7 @@ namespace XmlHelps
                 var attribute = XmlNode as XmlAttribute;
                 if (attribute != null && attribute.Name == OriginalName)
                 {
-                    attribute.Value = (Value ?? string.Empty).ToString();
+                    attribute.Value = ReplaceLowOrderASCIICharacters((Value ?? string.Empty).ToString());
                     return true;
                 }
             }
@@ -187,7 +187,7 @@ namespace XmlHelps
                 {
                     if (XmlNode.Name == OriginalName)
                     {
-                        XmlNode.FirstChild.Value = (Value ?? string.Empty).ToString();
+                        XmlNode.FirstChild.Value = ReplaceLowOrderASCIICharacters((Value ?? string.Empty).ToString());
                         return true;
                     }
                 }
@@ -196,6 +196,25 @@ namespace XmlHelps
             return false;
         }
 
+        /// <summary>
+        /// 过滤低位非打印字符
+        /// </summary>
+        private string ReplaceLowOrderASCIICharacters(string tmp)
+        {
+            if (string.IsNullOrEmpty(tmp))
+                return tmp;
+
+            StringBuilder info = new StringBuilder();
+            foreach (char cc in tmp)
+            {
+                int ss = (int)cc;
+                if (((ss >= 0) && (ss <= 8)) || ((ss >= 11) && (ss <= 12)) || ((ss >= 14) && (ss <= 32)))
+                    info.AppendFormat(" ", ss);//&#x{0:X};
+                else info.Append(cc);
+            }
+            return info.ToString();
+        }
+        
         #endregion
     }
 
