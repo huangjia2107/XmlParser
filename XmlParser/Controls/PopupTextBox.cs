@@ -102,6 +102,8 @@ namespace XmlParser.Controls
                 {
                     var topLeftToTargetPoint = this.PointFromScreen(new Point(rect.Left, rect.Top));
 
+                    _textBox.Width = Math.Max(0, this.ActualWidth - Math.Abs(topLeftToTargetPoint.X));
+
                     if (topLeftToTargetPoint.Y < 0)
                         _popup.VerticalOffset += this.ActualHeight;
                     else
@@ -112,6 +114,7 @@ namespace XmlParser.Controls
 
         void _popup_Closed(object sender, EventArgs e)
         {
+            _textBox.Width = this.ActualWidth;
             _popup.VerticalOffset = 0;
         }
 
