@@ -15,6 +15,7 @@ using System.Windows.Interop;
 using XmlParser.Helps;
 using System.Windows.Controls.Primitives;
 using XmlParser.Models;
+using System.ComponentModel;
 
 namespace XmlParser.Controls
 {
@@ -75,12 +76,6 @@ namespace XmlParser.Controls
             _popup = base.GetTemplateChild(PopupTemplateName) as Popup;
             _textBox = base.GetTemplateChild(TextBoxTemplateName) as TextBox;
 
-            _popup.Closed -= _popup_Closed;
-            _popup.Closed += _popup_Closed;
-
-            _popup.Opened -= _popup_Opened;
-            _popup.Opened += _popup_Opened;
-
             _textBox.LostFocus -= _textBox_LostFocus;
             _textBox.LostFocus += _textBox_LostFocus;
 
@@ -88,34 +83,35 @@ namespace XmlParser.Controls
             _textBox.PreviewKeyDown += _textBox_PreviewKeyDown;
 
             OnTextChanged(Text, Text);
+
+            var v = DependencyPropertyDescriptor.FromProperty(Popup.IsOpenProperty, typeof(Popup));
+            v.AddValueChanged(_popup, OnIsOpenPropertyChanged);
         }
 
-        void _popup_Opened(object sender, EventArgs e)
+        private void OnIsOpenPropertyChanged(object sender, EventArgs e)
         {
-            var fromVisual = (HwndSource)PresentationSource.FromVisual(_textBox);
-
-            if (fromVisual != null)
+            if (_popup.IsOpen)
             {
-                Win32.RECT rect;
+                /* one way */
+                if (_textBox.TranslatePoint(new Point(), this).Y > 0)
+                    _popup.VerticalOffset -= this.ActualHeight;
+                else
+                    _popup.VerticalOffset += this.ActualHeight;
 
-                if (Win32.GetWindowRect(fromVisual.Handle, out rect))
-                {
-                    var topLeftToTargetPoint = this.PointFromScreen(new Point(rect.Left, rect.Top));
+                /* another way
+                 * 
+                var thisToScreenPoint = this.PointToScreen(new Point());
+                var textBoxToScreenPoint = _textBox.PointToScreen(new Point());
 
-                    _textBox.Width = Math.Max(0, this.ActualWidth - Math.Abs(topLeftToTargetPoint.X));
+                if (thisToScreenPoint.Y < textBoxToScreenPoint.Y)
+                    _popup.VerticalOffset -= this.ActualHeight;
 
-                    if (topLeftToTargetPoint.Y < 0)
-                        _popup.VerticalOffset += this.ActualHeight;
-                    else
-                        _popup.VerticalOffset -= this.ActualHeight;
-                }
+                if (thisToScreenPoint.Y > textBoxToScreenPoint.Y)
+                    _popup.VerticalOffset += this.ActualHeight;
+                 * */
             }
-        }
-
-        void _popup_Closed(object sender, EventArgs e)
-        {
-            _textBox.Width = this.ActualWidth;
-            _popup.VerticalOffset = 0;
+            else
+                _popup.VerticalOffset = 0;
         }
 
         private void _textBox_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -150,7 +146,10 @@ namespace XmlParser.Controls
                 return;
 
             if (!_popup.IsOpen)
+            {
+                _textBox.Width = Math.Min(this.ActualWidth, SystemParameters.PrimaryScreenWidth - this.PointToScreen(new Point()).X);
                 _popup.IsOpen = true;
+            }
 
             if (_textBox != null && !_textBox.IsKeyboardFocusWithin)
             {
@@ -158,7 +157,7 @@ namespace XmlParser.Controls
                 _textBox.SelectAll();
 
                 e.Handled = true;
-            }
+            } 
         }
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
