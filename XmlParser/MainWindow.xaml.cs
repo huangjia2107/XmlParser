@@ -73,6 +73,8 @@ namespace XmlParser
         XmlHelps.XmlParser _xmlParserHelper = null;
         Stack<List<XmlParseNode>> nodeStack = new Stack<List<XmlParseNode>>();
 
+        bool _isJumpVerticalOffset = false;
+
         public MainWindow(string xmlPath)
         {
             InitializeComponent();
@@ -81,6 +83,23 @@ namespace XmlParser
 
             if (!string.IsNullOrEmpty(xmlPath) && File.Exists(xmlPath) && System.IO.Path.GetExtension(xmlPath).ToLower() == ".xml")
                 treeView.DataContext = _xmlParserHelper.TryParse(x => x.Load(xmlPath), false, ParseNode);
+        }
+
+        private void ScrollViewer_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
+        {
+            e.Handled = true;
+            _isJumpVerticalOffset = true;
+        }
+
+        private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (_isJumpVerticalOffset)
+            {
+                TreeViewScrollViewer.ScrollToVerticalOffset(TreeViewScrollViewer.VerticalOffset - e.VerticalChange);
+
+                _isJumpVerticalOffset = false;
+                e.Handled = true;
+            }
         }
 
         private void button2_Click(object sender, RoutedEventArgs e)
@@ -166,7 +185,7 @@ namespace XmlParser
             }
 
             //Visibility
-            xmlParseNode.IsVisible = MainBoardConfigVisibleNodeList.Contains(xmlParseNode.OriginalName);
+            //xmlParseNode.IsVisible = MainBoardConfigVisibleNodeList.Contains(xmlParseNode.OriginalName);
 
             //DisplayName
             if (xmlParseNode.OriginalName == "AfterPrintAdditionalHeat")
@@ -226,6 +245,8 @@ namespace XmlParser
             if (_xmlParserHelper != null)
                 treeView.DataContext = _xmlParserHelper.TryParse(x => x.Load(_xmlParserHelper.BaseURI), SortCheckBox.IsChecked.Value, ParseNode);
         }
+
+        
     }
 }
 

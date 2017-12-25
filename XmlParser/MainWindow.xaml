@@ -35,7 +35,8 @@
             <Button Grid.Column="9" Content="Save" Height="40" Width="100" Click="button2_Click" />
         </Grid>
 
-        <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Background="Transparent" PreviewDrop="ScrollViewer_PreviewDrop" AllowDrop="True">
+        <ScrollViewer x:Name="TreeViewScrollViewer" Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Background="Transparent" PreviewDrop="ScrollViewer_PreviewDrop" AllowDrop="True"
+                      ScrollChanged="ScrollViewer_ScrollChanged" RequestBringIntoView="ScrollViewer_RequestBringIntoView">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MinWidth="100"/>
