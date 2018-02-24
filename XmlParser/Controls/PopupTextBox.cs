@@ -36,6 +36,16 @@ namespace XmlParser.Controls
             DefaultStyleKeyProperty.OverrideMetadata(typeof(PopupTextBox), new FrameworkPropertyMetadata(typeof(PopupTextBox)));
         }
 
+        public PopupTextBox()
+        {
+            this.AddHandler(ScrollViewer.ScrollChangedEvent, new RoutedEventHandler(ScrollChangedRoutedEventHandler));
+        }
+
+        private void ScrollChangedRoutedEventHandler(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+        }
+        
         public static readonly RoutedEvent TextChangedEvent = EventManager.RegisterRoutedEvent("TextChanged", RoutingStrategy.Bubble, typeof(RoutedPropertyChangedEventHandler<string>), typeof(PopupTextBox));
         public event RoutedPropertyChangedEventHandler<string> TextChanged
         {
