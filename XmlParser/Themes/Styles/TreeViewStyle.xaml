@@ -76,7 +76,7 @@
                             <Path x:Name="TopVerLine"  Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2" Width="1" Data="M0,0 V1" Stroke="Black" Stretch="Fill" RenderOptions.EdgeMode="Aliased" StrokeThickness="1" StrokeDashArray="1,1"/>
                         </Grid>
 
-                        <Path x:Name="MiddleVerLine" Grid.Row="1" Width="1" Margin="0,-1" Stretch="Fill" Data="M0,0 V1" Stroke="Black" StrokeThickness="1" RenderOptions.EdgeMode="Aliased" StrokeDashArray="1,1"/>
+                        <Path x:Name="MiddleVerLine" Grid.Row="1" Width="1" Margin="0,-1,0,0" Stretch="Fill" Data="M0,0 V1" Stroke="Black" StrokeThickness="1" RenderOptions.EdgeMode="Aliased" StrokeDashArray="1,1"/>
 
                         <ToggleButton x:Name="Expander" ClickMode="Press" IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ExpandCollapseToggleStyle}"/>
 
